@@ -1,0 +1,83 @@
+//异步翻页功能
+private void getNewsList(HttpContext context)
+        {
+            JieJu.Cn.BLL.CY_InfoDetail cyInfoDeatilBll = new JieJu.Cn.BLL.CY_InfoDetail();
+            string str = "";
+            int pageSize = 15;
+            int totalPage = 0;
+            int pageindex = int.Parse(HttpUtility.UrlDecode(HttpContext.Current.Request.Form["pageindex"]));
+            DataTable dt = cyInfoDeatilBll.GetList("Checked =1", "UpdateTime desc").Tables[0];
+            int totalNum = dt.Rows.Count;
+            if (totalNum > 0)
+            {
+                if (totalNum % pageSize > 0)
+                {
+                    totalPage = totalNum / pageSize + 1;
+                }
+                else
+                {
+                    totalPage = totalNum / pageSize;
+                }
+                str += "<div class=\"pub-info\" deep=\"3\">";
+                int tempIndex = pageSize * (pageindex - 1);
+                int temptotal = tempIndex + 15;
+                if (totalPage == pageindex)
+                {
+                    temptotal = totalNum;
+                }
+                for (int i = tempIndex; i < temptotal; i++)
+                {
+                    str += "<div class=\"pub-info-list\">";
+                    str += "<a href =\"cy_news/detail" + dt.Rows[i]["ID"] + ".shtml\" >";
+                    str += "<img src = \"images/796181_250x140.png\" class=\"l\">";
+                    str += "<a href =\"cy_news/detail" + dt.Rows[i]["ID"] + ".shtml\">";
+                    str += "<h3 class=\"title\">" + dt.Rows[i]["ShortTitle"] + "</h3></a>";
+                    str += "<p><span class=\"words-limit\">" + dt.Rows[i]["SummaryContent"] + "</span></p>";
+                    str += "<div class=\"publish-from\">来源：" + dt.Rows[i]["Original"] + " <span class=\"s1\">" + dt.Rows[i]["Author"] + "</span>";
+                    str += "<span class=\"s2\">" + dt.Rows[i]["Hits"] + "浏览</span>";
+                    str += "<span class=\"s3\">" + dt.Rows[i]["UpdateTime"];
+                    str += "</span></div></div>";
+                }
+                str += "</div>";
+                str += "<div class=\"pagenav clearfix\">";
+                str += "<a href=\"javascript:;\" onclick=\"getNewsList(1)\" class=\"link link-prev link-disabled\">首页</a>";
+                if (pageindex == 2)
+                {
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(1)\" class=\"link\">1</a>";
+                }
+                if (pageindex == 3)
+                {
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex - 2) + ")\" class=\"link\">" + (pageindex - 2) + "</a>";
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex - 1) + ")\" class=\"link\">" + (pageindex - 1) + "</a>";
+                }
+                if (pageindex > 3)
+                {
+                    str += "<span class=\"link-text\">....</span>";
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex - 2) + ")\" class=\"link\">" + (pageindex - 2) + "</a>";
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex - 1) + ")\" class=\"link\">" + (pageindex - 1) + "</a>";
+                }
+                str += "<a href=\"javascript:;\"  class=\"link link-cur\">" + pageindex + "</a>";
+                if (totalPage - pageindex > 2)
+                {
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex + 1) + ")\" class=\"link\">" + (pageindex + 1) + "</a>";
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex + 2) + ")\" class=\"link\">" + (pageindex + 2) + "</a>";
+                    str += "<span class=\"link-text\">....</span>";
+                }
+                if (totalPage - pageindex == 2)
+                {
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex + 1) + ")\" class=\"link\">" + (pageindex + 1) + "</a>";
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + (pageindex + 2) + ")\" class=\"link\">" + (pageindex + 2) + "</a>";
+                }
+                if (totalPage - pageindex == 1)
+                {
+                    str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + totalPage + ")\" class=\"link\">" + totalPage + "</a>";
+                }
+                str += "<a href=\"javascript:;\" onclick=\"getNewsList(" + totalPage + ")\" class=\"link link-prev link-disabled\">末页</a>";
+            }
+            else
+            {
+                str += "暂无数据";
+            }
+            context.Response.Write(str);
+            return;
+        }
